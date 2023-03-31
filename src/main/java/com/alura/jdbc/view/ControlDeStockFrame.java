@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import javax.swing.JButton;
@@ -62,9 +63,9 @@ public class ControlDeStockFrame extends JFrame {
         botonEliminar = new JButton("Eliminar");
         botonModificar = new JButton("Modificar");
         botonReporte = new JButton("Ver Reporte");
-        botonEliminar.setBounds(10, 500, 80, 20);
-        botonModificar.setBounds(100, 500, 80, 20);
-        botonReporte.setBounds(190, 500, 80, 20);
+        botonEliminar.setBounds(10, 500, 150, 20);
+        botonModificar.setBounds(170, 500, 150, 20);
+        botonReporte.setBounds(330, 500, 150, 20);
 
         container.add(tabla);
         container.add(botonEliminar);
@@ -108,8 +109,8 @@ public class ControlDeStockFrame extends JFrame {
 
         botonGuardar = new JButton("Guardar");
         botonLimpiar = new JButton("Limpiar");
-        botonGuardar.setBounds(10, 175, 80, 20);
-        botonLimpiar.setBounds(100, 175, 80, 20);
+        botonGuardar.setBounds(10, 175, 150, 20);
+        botonLimpiar.setBounds(170, 175, 150, 20);
 
         container.add(labelNombre);
         container.add(labelDescripcion);
@@ -208,7 +209,11 @@ public class ControlDeStockFrame extends JFrame {
     }
 
     private void cargarTabla() {
-        var productos = this.productoController.listar();
+        try {
+			var productos = this.productoController.listar();
+		} catch (SQLException e) {
+			throw new RuntimeException();		
+		}
 
         try {
             // TODO

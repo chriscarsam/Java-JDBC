@@ -1,7 +1,6 @@
 package com.alura.jdbc.controller;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.alura.jdbc.factory.ConnectionFactory;
 
 public class ProductoController {
 
@@ -21,10 +22,7 @@ public class ProductoController {
 	}
 
 	public List<Map<String, String>> listar() throws SQLException {
-		Connection con = DriverManager.getConnection(
-                "jdbc:mysql://172.17.0.2/control_de_stock?useTimeZone=true&serverTimeZone=UTC",
-                "user",
-                "clave");
+		Connection con = new ConnectionFactory().recupetaConexion();
 		
 		Statement statement = con.createStatement();
 		
@@ -49,8 +47,23 @@ public class ProductoController {
 		return resultado;
 	}
 
-    public void guardar(Object producto) {
-		// TODO
+    public void guardar(Map<String, String> producto) throws SQLException {
+		Connection con = new ConnectionFactory().recupetaConexion();
+		
+		Statement statement = con.createStatement();
+		
+		statement.execute("INSERT INTO producto(nombre, descripcion, cantidad)" 
+				+ " VALUES('" + producto.get("nombre") + "', '"
+				+ producto.get("descripcion") + "', "
+				+ producto.get("cantidad") + ")", Statement.RETURN_GENERATED_KEYS
+				);
+		
+		ResultSet resultSet = statement.getGeneratedKeys();
+		
+		while(resultSet.next()) {
+			System.out.println(String.format("Fue insertado el producto de ID %d", resultSet.getInt(1)));
+		}
+		
 	}
 
 }

@@ -180,16 +180,26 @@ public class ControlDeStockFrame extends JFrame {
         if (tieneFilaElegida()) {
             JOptionPane.showMessageDialog(this, "Por favor, elije un item");
             return;
-        }
-
-        Optional.ofNullable(modelo.getValueAt(tabla.getSelectedRow(), tabla.getSelectedColumn()))
+        }  
+        
+		Optional.ofNullable(modelo.getValueAt(tabla.getSelectedRow(), tabla.getSelectedColumn()))
                 .ifPresentOrElse(fila -> {
-                    Integer id = (Integer) modelo.getValueAt(tabla.getSelectedRow(), 0);
+                    Integer id = Integer.valueOf(modelo.getValueAt(tabla.getSelectedRow(), 0).toString());
                     String nombre = (String) modelo.getValueAt(tabla.getSelectedRow(), 1);
                     String descripcion = (String) modelo.getValueAt(tabla.getSelectedRow(), 2);
-
-                    this.productoController.modificar(nombre, descripcion, id);
-                }, () -> JOptionPane.showMessageDialog(this, "Por favor, elije un item"));
+                    Integer cantidad = Integer.valueOf(modelo.getValueAt(tabla.getSelectedRow(), 3).toString());
+                  
+                    int filasModificadas;
+                    
+                    try {
+                    	filasModificadas = this.productoController.modificar(nombre, descripcion, cantidad, id);
+					} catch (SQLException e) {
+						throw new RuntimeException(e);					
+					}
+                    
+                    JOptionPane.showMessageDialog(this, String.format("%d item modificado con éxito!", filasModificadas));
+                    
+                }, () -> JOptionPane.showMessageDialog(this, " Por favor, elije un item"));
     }
 
     private void eliminar() {
@@ -206,7 +216,7 @@ public class ControlDeStockFrame extends JFrame {
                     try {
                     	cantidadEliminada = this.productoController.eliminar(id);
 					} catch (SQLException e) {
-						throw new RuntimeException();
+						throw new RuntimeException(e);
 					}
 
                     modelo.removeRow(tabla.getSelectedRow());
@@ -232,7 +242,7 @@ public class ControlDeStockFrame extends JFrame {
 	        }
 			
 		} catch (SQLException e) {
-			throw new RuntimeException();		
+			throw new RuntimeException(e);		
 		}
         
     }

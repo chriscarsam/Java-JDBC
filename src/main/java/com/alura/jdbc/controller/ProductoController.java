@@ -89,15 +89,24 @@ public class ProductoController {
 		PreparedStatement statement = con.prepareStatement("INSERT INTO producto(nombre, descripcion, cantidad)" 
 				+ " VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 		
-		do {
-			int cantidadParaGuardar = Math.min(cantidad, maximoCantidad);
+		try {
+			do {
+				int cantidadParaGuardar = Math.min(cantidad, maximoCantidad);
+				
+				ejecutarRegistro(nombre, descripcion,  cantidadParaGuardar, statement);
+				
+				cantidad -= maximoCantidad;
+				
+			} while (cantidad > 0);		
 			
-			ejecutarRegistro(nombre, descripcion,  cantidadParaGuardar, statement);
-			
-			cantidad -= maximoCantidad;
-			
-		} while (cantidad > 0);		
+			con.commit();
+			System.out.println("COMMIT");
+		} catch (Exception e) {
+			con.rollback();
+			System.out.println("ROLLBACK");
+		}	
 		
+		statement.close();
 		
 		con.close();
 		
@@ -105,6 +114,10 @@ public class ProductoController {
 
 	private void ejecutarRegistro(String nombre, String descripcion, Integer cantidad, PreparedStatement statement)
 			throws SQLException {
+		
+		if (cantidad < 50) {
+			throw new RuntimeException("Ocurrió un error");
+		}
 
 		statement.setString(1, nombre);		
 		statement.setString(2, descripcion);	

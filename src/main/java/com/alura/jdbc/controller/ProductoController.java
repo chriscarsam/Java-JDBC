@@ -21,46 +21,15 @@ public class ProductoController {
 		this.productoDAO = new ProductoDAO(new ConnectionFactory().recupetaConexion());
 	}
 
-	public int modificar(String nombre, String descripcion, Integer cantidad ,Integer id) throws SQLException {
-		final Connection con = new ConnectionFactory().recupetaConexion();
-		
-		try (con) {			
-	
-			final PreparedStatement statement = con.prepareStatement("UPDATE producto SET "
-					+ "nombre = ?, "
-					+ "descripcion = ?, "
-					+ "cantidad = ? "
-					+ "WHERE id = ?");
-			
-			try(statement) {
-				statement.setString(1, nombre);
-				statement.setString(2, descripcion);
-				statement.setInt(3, cantidad);
-				statement.setInt(4, id);
-				
-				statement.execute();	
-				
-				int updateCount = statement.getUpdateCount();
-							
-				return updateCount;
-			}
-		}
+	public int modificar(String nombre, String descripcion, Integer cantidad ,Integer id){
+		return productoDAO.modificar(nombre, descripcion, cantidad, id);
 	
 	}
 
-	public int eliminar(Integer id) throws SQLException {
-		final Connection con = new ConnectionFactory().recupetaConexion();
-		try(con){
-			final PreparedStatement statement = con.prepareStatement("DELETE FROM producto WHERE id = ?");
+	public int eliminar(Integer id) {
+		
+		return productoDAO.eliminar(id);		
 			
-			try(statement){
-				statement.setInt(1, id);
-				
-				statement.execute();
-				
-				return statement.getUpdateCount();
-			}
-		}		
 	}
 
 	public List<Producto> listar() {

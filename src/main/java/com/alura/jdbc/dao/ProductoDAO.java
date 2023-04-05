@@ -5,7 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import com.alura.jdbc.factory.ConnectionFactory;
 import com.alura.jdbc.modelo.Producto;
 
 public class ProductoDAO {
@@ -16,28 +21,24 @@ public class ProductoDAO {
 		this.con = con;
 	}
 
-	public void guardar(Producto producto) throws SQLException {
+	public void guardar(Producto producto) {
 		
-		try(con){
-			con.setAutoCommit(false);
+		try(con){			
 			
 			final PreparedStatement statement = con.prepareStatement("INSERT INTO producto(nombre, descripcion, cantidad)" 
 					+ " VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);			
 			
-			try(statement){				
+			try(statement){		
 				
 					ejecutarRegistro(producto, statement);
-				
-					con.commit();
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("ROLLBACK de la transacción");
-					con.rollback();
-					
-				}			
+									
+			}
+		} catch (SQLException e) {
 			
-		}
+			throw new RuntimeException(e);
+			
+		}			
+	
 	}
 	
 	private void ejecutarRegistro(Producto producto, PreparedStatement statement)
@@ -58,4 +59,43 @@ public class ProductoDAO {
 			}
 		}
 	}
+
+	public List<Producto> listar() {
+		
+		List<Producto> resultado = new ArrayList<>();
+		
+		ConnectionFactory factory = new ConnectionFactory();
+		
+		final Connection con = factory.recupetaConexion();
+		
+		try(con){
+		
+			final PreparedStatement statement = con.prepareStatement("SELECT id, nombre, descripcion, cantidad FROM producto");
+			
+			try(statement){
+				statement.execute();
+				
+				final ResultSet resultSet = statement.getResultSet();
+				
+				try(resultSet){
+					while(resultSet.next()) {
+						Producto fila = new Producto(
+								resultSet.getInt("id"),
+								resultSet.getString("nombre"),
+								resultSet.getString("descripcion"),
+								resultSet.getInt("cantidad")
+								);
+						
+						resultado.add(fila);
+					}	
+					
+				}				
+						
+		}
+			return resultado;
+		} catch(SQLException e) {
+			throw new RuntimeException();
+		}
+	}
+		
 }

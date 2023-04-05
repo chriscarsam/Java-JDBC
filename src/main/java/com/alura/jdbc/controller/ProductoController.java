@@ -14,6 +14,12 @@ import com.alura.jdbc.factory.ConnectionFactory;
 import com.alura.jdbc.modelo.Producto;
 
 public class ProductoController {
+	
+	private ProductoDAO productoDAO;
+	
+	public ProductoController() {
+		this.productoDAO = new ProductoDAO(new ConnectionFactory().recupetaConexion());
+	}
 
 	public int modificar(String nombre, String descripcion, Integer cantidad ,Integer id) throws SQLException {
 		final Connection con = new ConnectionFactory().recupetaConexion();
@@ -57,38 +63,13 @@ public class ProductoController {
 		}		
 	}
 
-	public List<Map<String, String>> listar() throws SQLException {
+	public List<Producto> listar() {
 		
-		final Connection con = new ConnectionFactory().recupetaConexion();
+		return productoDAO.listar();		
 		
-		try(con){
-		
-			final PreparedStatement statement = con.prepareStatement("SELECT id, nombre, descripcion, cantidad FROM producto");
-			
-			try(statement){
-				statement.execute();
-				
-				ResultSet resultSet = statement.getResultSet();
-				
-				List<Map<String, String>> resultado = new ArrayList<>();
-				
-				while(resultSet.next()) {
-					Map<String, String> fila = new HashMap<>();
-					fila.put("id", String.valueOf(resultSet.getInt("id")));
-					fila.put("nombre", resultSet.getString("nombre"));
-					fila.put("descripcion", resultSet.getString("descripcion"));
-					fila.put("cantidad", String.valueOf(resultSet.getInt("cantidad")));
-					
-					resultado.add(fila);
-				}	
-				return resultado;
-			}			
-		}
 	}
 
-    public void guardar(Producto producto) throws SQLException {
-    	
-    	ProductoDAO productoDAO = new ProductoDAO(new ConnectionFactory().recupetaConexion());
+    public void guardar(Producto producto){
     	
     	productoDAO.guardar(producto);
     	

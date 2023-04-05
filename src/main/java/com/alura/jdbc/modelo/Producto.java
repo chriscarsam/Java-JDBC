@@ -6,6 +6,7 @@ public class Producto {
 	private String nombre;
 	private String descripcion;
 	private Integer cantidad;
+	private Integer categoriaId;
 	
 	public Producto(String nombre, String descripcion, Integer cantidad) {
 		this.nombre = nombre;
@@ -38,6 +39,15 @@ public class Producto {
 
 	public void setId(int id) {
 		this.id = id;		
+	}
+	
+	public int getCategoriaId() {	
+		return this.categoriaId;
+	}
+
+	public void setCategoriaId(Integer categoriaId) {
+		this.categoriaId = categoriaId;
+		
 	}
 	
 	@Override

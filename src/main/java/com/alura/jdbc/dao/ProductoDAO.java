@@ -90,10 +90,11 @@ public class ProductoDAO {
 				}				
 						
 		}
-			return resultado;
+		
 		} catch(SQLException e) {
 			throw new RuntimeException();
 		}
+		return resultado;
 	}
 
 	public int eliminar(Integer id) {
@@ -142,6 +143,50 @@ public class ProductoDAO {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public List<Producto> listar(Integer categoriaId) {
+	List<Producto> resultado = new ArrayList<>();
+		
+		ConnectionFactory factory = new ConnectionFactory();
+		
+		final Connection con = factory.recupetaConexion();
+		
+		try(con){
+			var querySelect ="SELECT id, nombre, descripcion, cantidad "
+					+ " FROM producto "
+					+ " WHERE categoria_id = ?";
+			
+			System.out.println(querySelect);
+			
+			final PreparedStatement statement = con.prepareStatement(querySelect);
+			
+			try(statement){
+				statement.setInt(1, categoriaId);
+				statement.execute();
+				
+				final ResultSet resultSet = statement.getResultSet();
+				
+				try(resultSet){
+					while(resultSet.next()) {
+						Producto fila = new Producto(
+								resultSet.getInt("id"),
+								resultSet.getString("nombre"),
+								resultSet.getString("descripcion"),
+								resultSet.getInt("cantidad")
+								);
+						
+						resultado.add(fila);
+					}	
+					
+				}				
+						
+		}
+			
+		} catch(SQLException e) {
+			throw new RuntimeException();
+		}
+		return resultado;
 	}
 		
 }
